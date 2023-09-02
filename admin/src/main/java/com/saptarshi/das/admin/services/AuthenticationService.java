@@ -1,6 +1,7 @@
 package com.saptarshi.das.admin.services;
 
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
+import com.saptarshi.das.admin.exceptions.UserNotFoundException;
 import com.saptarshi.das.admin.models.Role;
 import com.saptarshi.das.admin.models.User;
 import com.saptarshi.das.admin.repositories.UserRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +47,7 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws UserNotFoundException {
         final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
@@ -55,7 +57,7 @@ public class AuthenticationService {
         final Optional<User> user = userRepository.findByEmail(request.getEmail());
 
         if (user.isEmpty()) {
-            return null;
+            throw new UserNotFoundException("User Not Found");
         }
 
         final String token = jwtService.generateToken(user.get());
