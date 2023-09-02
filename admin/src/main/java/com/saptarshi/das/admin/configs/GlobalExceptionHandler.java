@@ -1,5 +1,6 @@
 package com.saptarshi.das.admin.configs;
 
+import com.saptarshi.das.admin.exceptions.BaseException;
 import com.saptarshi.das.admin.responses.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final String message = "Oops... Something went wrong! Please try after sometime.";
         final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
                 .message(message)
+                .build();
+        return new ResponseEntity<>(
+                exceptionResponse,
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    public ResponseEntity<ExceptionResponse> handleBaseException(
+            final BaseException ex,
+            final WebRequest request
+    ) {
+        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
+                .message(ex.getResponseMessage())
                 .build();
         return new ResponseEntity<>(
                 exceptionResponse,
