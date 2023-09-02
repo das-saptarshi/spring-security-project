@@ -1,17 +1,17 @@
 package com.saptarshi.das.admin.exceptions;
 
-import lombok.Getter;
+import com.saptarshi.das.admin.constants.ExceptionConstants;
 
-@Getter
-public class UserAlreadyExistsException extends Exception {
-    private final String responseMessage;
-
-    public UserAlreadyExistsException(final String responseMessage) {
-        this(null, responseMessage);
+public class UserAlreadyExistsException extends BaseException {
+    public UserAlreadyExistsException(final String responseMessage, final String logMessage) {
+        super(responseMessage, logMessage);
     }
 
-    public UserAlreadyExistsException(final String message, final String responseMessage) {
-        super(message);
-        this.responseMessage = responseMessage;
+    public UserAlreadyExistsException(final String responseMessage) {
+        super(responseMessage);
+    }
+
+    public UserAlreadyExistsException() {
+        super();
     }
 }
