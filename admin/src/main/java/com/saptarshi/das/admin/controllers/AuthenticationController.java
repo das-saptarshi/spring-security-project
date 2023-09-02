@@ -1,12 +1,11 @@
 package com.saptarshi.das.admin.controllers;
 
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
-import com.saptarshi.das.admin.exceptions.UserNotFoundException;
 import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.services.AuthenticationService;
-import com.saptarshi.das.admin.services.RegistrationResponse;
+import com.saptarshi.das.admin.responses.RegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +28,7 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public AuthenticationResponse authenticate(
             @RequestBody AuthenticationRequest request
-    ) throws UserNotFoundException {
+    ) {
         return authenticationService.authenticate(request);
     }
 }

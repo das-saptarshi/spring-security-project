@@ -13,7 +13,7 @@ public abstract class BaseException extends Exception {
     }
 
     protected BaseException(final String responseMessage) {
-        this(ExceptionConstants.SOME_WENT_WRONG_MESSAGE, responseMessage);
+        this(responseMessage, ExceptionConstants.SOME_WENT_WRONG_MESSAGE);
     }
 
     protected BaseException() {
