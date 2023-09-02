@@ -6,10 +6,9 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/jwt_security
     username: app_server
     password: Password@123
-    driver-class-name: com.mysql.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
