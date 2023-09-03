@@ -8,9 +8,16 @@ import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
+import com.saptarshi.das.admin.responses.VerifiedUserResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -47,7 +55,7 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse generateToken(AuthenticationRequest request) {
         final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
@@ -59,6 +67,23 @@ public class AuthenticationService {
         final String token = jwtService.generateToken(user.get());
         return AuthenticationResponse.builder()
                 .token(token)
+                .build();
+    }
+
+    public VerifiedUserResponse verifyToken(@NonNull final String token) {
+        final String username = jwtService.extractUsername(token);
+        if (StringUtils.isBlank(username)) {
+            throw new AccessDeniedException("Access Denied! No Token Found.");
+        }
+
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (! jwtService.isValidToken(token, userDetails)) {
+            throw new AccessDeniedException("Access Denied! Invalid Token.");
+        }
+
+        return VerifiedUserResponse.builder()
+                .userDetails(userDetails)
                 .build();
     }
 }

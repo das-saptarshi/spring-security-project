@@ -3,7 +3,9 @@ package com.saptarshi.das.admin.controllers;
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
 import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
+import com.saptarshi.das.admin.requests.VerifyTokenRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
+import com.saptarshi.das.admin.responses.VerifiedUserResponse;
 import com.saptarshi.das.admin.services.AuthenticationService;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +27,18 @@ public class AuthenticationController {
         return authenticationService.register(request);
     }
 
-    @PostMapping("/authenticate")
-    public AuthenticationResponse authenticate(
+    @PostMapping("/generate-token")
+    public AuthenticationResponse generateToken(
             @RequestBody AuthenticationRequest request
     ) {
-        return authenticationService.authenticate(request);
+        return authenticationService.generateToken(request);
+    }
+
+    @PostMapping("/verify-token")
+    public VerifiedUserResponse verifyToken(
+            @RequestBody final VerifyTokenRequest request
+    ) {
+        System.out.println(request);
+        return authenticationService.verifyToken(request.getToken());
     }
 }
