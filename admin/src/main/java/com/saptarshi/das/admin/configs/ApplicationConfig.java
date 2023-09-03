@@ -29,14 +29,14 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationProvider getAuthenticationProvider() {
-        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(getUserDetailsService());
-        authenticationProvider.setPasswordEncoder(getPasswordEncoder());
-
-        return authenticationProvider;
-    }
+//    @Bean
+//    public AuthenticationProvider getAuthenticationProvider() {
+//        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(getUserDetailsService());
+//        authenticationProvider.setPasswordEncoder(getPasswordEncoder());
+//
+//        return authenticationProvider;
+//    }
 
     @Bean
     public AuthenticationManager getAuthenticationManager(

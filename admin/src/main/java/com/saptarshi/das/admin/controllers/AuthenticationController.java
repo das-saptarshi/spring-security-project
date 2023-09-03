@@ -3,11 +3,11 @@ package com.saptarshi.das.admin.controllers;
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
 import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
-import com.saptarshi.das.admin.requests.VerifyTokenRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
-import com.saptarshi.das.admin.responses.VerifiedUserResponse;
 import com.saptarshi.das.admin.services.AuthenticationService;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
+import com.saptarshi.das.core.requests.VerifyTokenRequest;
+import com.saptarshi.das.core.responses.VerifiedUserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +39,8 @@ public class AuthenticationController {
             @RequestBody final VerifyTokenRequest request
     ) {
         System.out.println(request);
-        return authenticationService.verifyToken(request.getToken());
+        final VerifiedUserResponse response = authenticationService.verifyToken(request.getToken());
+        System.out.println(response);
+        return response;
     }
 }
