@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER = "BEARER ";
+    private static final String BEARER = "Bearer ";
 
     public JwtAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
                                    AuthenticationManager authenticationManager) {
