@@ -16,9 +16,11 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER = "BEARER ";
 
     public JwtAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
-                                      AuthenticationManager authenticationManager) {
+                                   AuthenticationManager authenticationManager) {
         super(requiresAuthenticationRequestMatcher, authenticationManager);
     }
 
@@ -27,13 +29,17 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
             HttpServletRequest request,
             HttpServletResponse response
     ) throws AuthenticationException, IOException, ServletException {
-        final String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.isBlank(bearerToken) || !bearerToken.startsWith("Bearer ")) {
-            return new UsernamePasswordAuthenticationToken("", "");
+        final String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+
+        if (StringUtils.isBlank(bearerToken) || !bearerToken.startsWith(BEARER)) {
+            return new UsernamePasswordAuthenticationToken(null, null);
         }
 
         final String jwtToken = bearerToken.substring(7);
-        return new UsernamePasswordAuthenticationToken(jwtToken, jwtToken);
+        final UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(jwtToken, jwtToken);
+
+        return this.getAuthenticationManager().authenticate(authToken);
     }
 
     @Override

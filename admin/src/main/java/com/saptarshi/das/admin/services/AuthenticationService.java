@@ -2,12 +2,13 @@ package com.saptarshi.das.admin.services;
 
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
 import com.saptarshi.das.admin.models.Role;
-import com.saptarshi.das.admin.models.User;
+import com.saptarshi.das.admin.models.UserEntity;
 import com.saptarshi.das.admin.repositories.UserRepository;
 import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
+import com.saptarshi.das.core.models.User;
 import com.saptarshi.das.core.responses.VerifiedUserResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +34,13 @@ public class AuthenticationService {
     private final JwtService jwtService;
 
     public RegistrationResponse register(final RegisterRequest request) throws UserAlreadyExistsException {
-        final Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        final Optional<UserEntity> existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser.isPresent()) {
             throw new UserAlreadyExistsException("User Already Exists!");
         }
 
-        final User user = User.builder()
+        final UserEntity user = UserEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -62,7 +64,7 @@ public class AuthenticationService {
 
         authenticationManager.authenticate(authToken);
 
-        final Optional<User> user = userRepository.findByEmail(request.getEmail());
+        final Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
         final String token = jwtService.generateToken(user.get());
         return AuthenticationResponse.builder()
                 .token(token)
@@ -81,8 +83,19 @@ public class AuthenticationService {
             throw new AccessDeniedException("Access Denied! Invalid Token.");
         }
 
+        final User user = User.builder()
+                .email(userDetails.getUsername())
+                .password(userDetails.getPassword())
+                .authorities(userDetails.getAuthorities())
+                .build();
+
         return VerifiedUserResponse.builder()
-                .userDetails(userDetails)
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getAuthorities().stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.toList())
+                )
                 .build();
     }
 }

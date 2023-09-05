@@ -38,9 +38,6 @@ public class AuthenticationController {
     public VerifiedUserResponse verifyToken(
             @RequestBody final VerifyTokenRequest request
     ) {
-        System.out.println(request);
-        final VerifiedUserResponse response = authenticationService.verifyToken(request.getToken());
-        System.out.println(response);
-        return response;
+        return authenticationService.verifyToken(request.getToken());
     }
 }
