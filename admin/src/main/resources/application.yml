@@ -2,16 +2,13 @@ server:
   port: 8080
 
 spring:
+  h2:
+    console:
+      enabled: true
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/jwt_security
+    url: jdbc:h2:mem:spring_security
     username: app_server
     password: Password@123
+    driverClassName: org.h2.Driver
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format-sql: true
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
