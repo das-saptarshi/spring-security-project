@@ -28,19 +28,4 @@ public class ApplicationConfig {
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public AuthenticationProvider getAuthenticationProvider() {
-//        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-//        authenticationProvider.setUserDetailsService(getUserDetailsService());
-//        authenticationProvider.setPasswordEncoder(getPasswordEncoder());
-//
-//        return authenticationProvider;
-//    }
-
-    @Bean
-    public AuthenticationManager getAuthenticationManager(
-            final AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
 }
