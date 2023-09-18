@@ -1,5 +1,8 @@
 package com.saptarshi.das.admin.configs;
 
+import com.saptarshi.das.core.redis.AuthRedisClient;
+import com.saptarshi.das.core.redis.RedisClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +19,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Value("${redis.host}")
+    private String host;
+
+    @Value("${redis.port}")
+    private Integer port;
 
     @Bean
     public SecurityFilterChain getSecurityFilterChain(final HttpSecurity http) throws Exception {
@@ -34,5 +43,10 @@ public class SecurityConfig {
     public AuthenticationManager getAuthenticationManager(
             final AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public RedisClient getRedisClient() {
+        return new AuthRedisClient(host, port);
     }
 }

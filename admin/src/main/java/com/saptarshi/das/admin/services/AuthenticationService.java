@@ -1,5 +1,6 @@
 package com.saptarshi.das.admin.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
 import com.saptarshi.das.admin.models.Role;
 import com.saptarshi.das.admin.models.UserEntity;
@@ -9,6 +10,7 @@ import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
 import com.saptarshi.das.core.models.User;
+import com.saptarshi.das.core.redis.RedisClient;
 import com.saptarshi.das.core.responses.VerifiedUserResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RedisClient redis;
 
     public RegistrationResponse register(final RegisterRequest request) throws UserAlreadyExistsException {
         final Optional<UserEntity> existingUser = userRepository.findByEmail(request.getEmail());
@@ -56,7 +59,7 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponse generateToken(AuthenticationRequest request) {
+    public AuthenticationResponse generateToken(final AuthenticationRequest request) throws JsonProcessingException {
         final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
@@ -66,6 +69,7 @@ public class AuthenticationService {
 
         final Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
         final String token = jwtService.generateToken(user.get());
+        redis.setUserDetailsAndToken(user.get(), token);
         return AuthenticationResponse.builder()
                 .token(token)
                 .build();

@@ -1,5 +1,6 @@
 package com.saptarshi.das.admin.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.saptarshi.das.admin.exceptions.UserAlreadyExistsException;
 import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
@@ -30,7 +31,7 @@ public class AuthenticationController {
     @PostMapping("/generate-token")
     public AuthenticationResponse generateToken(
             @RequestBody AuthenticationRequest request
-    ) {
+    ) throws JsonProcessingException {
         return authenticationService.generateToken(request);
     }
 
