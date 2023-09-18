@@ -1,7 +1,10 @@
 package com.saptarshi.das.demoservice.configs;
 
+import com.saptarshi.das.core.redis.AuthRedisClient;
+import com.saptarshi.das.core.redis.RedisClient;
 import com.saptarshi.das.core.security.JwtAuthenticationFilter;
 import com.saptarshi.das.core.security.JwtAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +27,12 @@ public class SecurityConfig {
     private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/**")
     );
+
+    @Value("${redis.host}")
+    private String host;
+
+    @Value("${redis.port}")
+    private Integer port;
 
     @Bean
     public SecurityFilterChain getSecurityFilterChain(final HttpSecurity http) throws Exception {
@@ -54,5 +63,10 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter getJwtAuthenticationFilter(final HttpSecurity http) throws Exception {
         return new JwtAuthenticationFilter(PROTECTED_URLS, getAuthenticationManager(http));
+    }
+
+    @Bean
+    public RedisClient getRedisClient() {
+        return new AuthRedisClient(host, port);
     }
 }
