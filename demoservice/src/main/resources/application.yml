@@ -4,6 +4,8 @@ server:
 service:
   admin-url: http://localhost:8080/api/auth/verify-token
 
-redis:
-  host: 127.0.0.1
-  port: 6379
+security:
+  type: token
+  redis:
+    host: 127.0.0.1
+    port: 6379
