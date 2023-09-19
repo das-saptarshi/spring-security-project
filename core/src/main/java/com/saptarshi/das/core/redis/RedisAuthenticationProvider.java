@@ -1,18 +1,19 @@
-package com.saptarshi.das.core.security;
+package com.saptarshi.das.core.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.saptarshi.das.core.redis.RedisClient;
-import com.saptarshi.das.core.redis.TokenNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+@Slf4j
+public class RedisAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+    private final RedisClient redis;
 
-    @Autowired
-    private RedisClient redis;
+    public RedisAuthenticationProvider(final RedisClient redis) {
+        this.redis = redis;
+    }
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
@@ -24,6 +25,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
             String username,
             UsernamePasswordAuthenticationToken authentication
     ) throws AuthenticationException {
+        log.info("In Redis Based Authentication.");
         try {
             final String token = authentication.getPrincipal().toString();
             return redis.getUserDetailsFromToken(token);

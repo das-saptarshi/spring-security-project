@@ -12,13 +12,13 @@ import redis.clients.jedis.JedisPooled;
 
 import java.util.stream.Collectors;
 
-public class AuthRedisClient implements RedisClient {
+public class RedisAuthClient implements RedisClient {
     private static final long EXPIRATION = 60 * 60;
     private static final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final JedisPooled redis;
 
-    public AuthRedisClient(final String host, final Integer port) {
+    public RedisAuthClient(final String host, final Integer port) {
         redis = new JedisPooled(host, port);
     }
 

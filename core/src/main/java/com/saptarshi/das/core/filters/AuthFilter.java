@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.security;
+package com.saptarshi.das.core.filters;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -15,12 +15,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.io.IOException;
 
-public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class AuthFilter extends AbstractAuthenticationProcessingFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER = "Bearer ";
 
-    public JwtAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
-                                   AuthenticationManager authenticationManager) {
+    public AuthFilter(RequestMatcher requiresAuthenticationRequestMatcher,
+                      AuthenticationManager authenticationManager) {
         super(requiresAuthenticationRequestMatcher, authenticationManager);
     }
 

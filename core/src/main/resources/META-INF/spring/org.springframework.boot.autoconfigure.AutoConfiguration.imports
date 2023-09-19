@@ -1,0 +1,2 @@
+com.saptarshi.das.core.redis.RedisSecurityAutoConfiguration
+com.saptarshi.das.core.token.TokenSecurityAutoConfiguration
