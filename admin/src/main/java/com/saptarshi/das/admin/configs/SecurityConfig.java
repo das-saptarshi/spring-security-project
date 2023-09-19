@@ -1,6 +1,6 @@
 package com.saptarshi.das.admin.configs;
 
-import com.saptarshi.das.core.redis.AuthRedisClient;
+import com.saptarshi.das.core.redis.RedisAuthClient;
 import com.saptarshi.das.core.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +47,6 @@ public class SecurityConfig {
 
     @Bean
     public RedisClient getRedisClient() {
-        return new AuthRedisClient(host, port);
+        return new RedisAuthClient(host, port);
     }
 }

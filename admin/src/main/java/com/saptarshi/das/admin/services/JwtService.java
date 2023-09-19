@@ -5,12 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -18,19 +20,25 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY = "fa7eb9f8667c865173e585ef77c6263490eb59e8b679bf73bac84936a2e77cfd";
     public String extractUsername(final String token) {
-        return extractClaims(token, Claims::getSubject);
+        return extractClaims(token, claims -> claims.get("email", String.class));
     }
 
     public String generateToken(final UserDetails userDetails) {
-        return generateToken(Collections.emptyMap(), userDetails);
+        final Map<String, Object> claims = new HashMap<>();
+        final List<String> authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        claims.put("email", userDetails.getUsername());
+        claims.put("password", userDetails.getPassword());
+        claims.put("authorities", authorities);
+
+        return generateToken(claims);
     }
 
-    public String generateToken(final Map<String, Object> claims,
-                                final UserDetails userDetails) {
+    private String generateToken(final Map<String, Object> claims) {
         return Jwts
                 .builder()
                 .setClaims(claims)
-                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
