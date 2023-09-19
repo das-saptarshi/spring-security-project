@@ -33,14 +33,21 @@ public class AuthRedisClient implements RedisClient {
                         .collect(Collectors.toList())
                 )
                 .build();
+        if (redis.exists(user.getEmail())) {
+            final String existingToken = redis.get(user.getEmail());
+            redis.del(existingToken, user.getEmail());
+        }
         redis.setex(user.getEmail(), EXPIRATION, token);
         redis.setex(token, EXPIRATION, mapper.writeValueAsString(user));
     }
 
     @Override
-    public UserDetails getUserDetailsFromToken(@NonNull String token) throws JsonProcessingException {
+    public UserDetails getUserDetailsFromToken(@NonNull String token)
+            throws JsonProcessingException, TokenNotFoundException {
+        if (! redis.exists(token)) {
+            throw new TokenNotFoundException("Invalid Token");
+        }
         final String value = redis.get(token);
-        System.out.println("Redis Key: " + token + ", Value: " + value);
         final RedisUser user = mapper.readValue(value, new TypeReference<RedisUser>() {});
 
         return User.builder()

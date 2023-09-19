@@ -2,6 +2,7 @@ package com.saptarshi.das.core.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.saptarshi.das.core.redis.RedisClient;
+import com.saptarshi.das.core.redis.TokenNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -25,9 +26,8 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
     ) throws AuthenticationException {
         try {
             final String token = authentication.getPrincipal().toString();
-            System.out.println("JWT: " + token);
             return redis.getUserDetailsFromToken(token);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | TokenNotFoundException e) {
             throw new AuthenticationException("Invalid Token/User.") {};
         }
     }
