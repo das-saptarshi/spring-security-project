@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,8 +41,8 @@ public class RedisSecurityAutoConfiguration {
 
     @Bean
     public SecurityFilterChain getSecurityFilterChain(final HttpSecurity security,
-                                                      final AuthFilter authFilter) throws Exception {
-
+                                                      final AuthFilter authFilter
+    ) throws Exception {
         security
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
@@ -58,16 +58,15 @@ public class RedisSecurityAutoConfiguration {
         return new RedisAuthClient(host, port);
     }
 
-
-    private AuthenticationProvider getAuthenticationProvider() {
+    @Bean
+    public AuthenticationProvider getAuthenticationProvider() {
         return new RedisAuthenticationProvider(getRedisClient());
     }
 
     @Bean
-    public AuthenticationManager getAuthenticationManager(final HttpSecurity security) throws Exception {
-        return security.getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationProvider(getAuthenticationProvider())
-                .build();
+    public AuthenticationManager getAuthenticationManager(final AuthenticationConfiguration authenticationConfiguration
+    ) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
