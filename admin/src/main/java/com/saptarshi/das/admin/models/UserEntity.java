@@ -22,6 +22,8 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy =  GenerationType.UUID)
     private String id;
+    @Column(unique = true)
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
@@ -41,7 +43,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

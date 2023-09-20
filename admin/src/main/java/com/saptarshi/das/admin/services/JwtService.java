@@ -16,11 +16,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.saptarshi.das.core.constants.SecurityConstants.AUTHORITIES_KEY;
+import static com.saptarshi.das.core.constants.SecurityConstants.EXPIRATION_DURATION_IN_MILLISECONDS;
+import static com.saptarshi.das.core.constants.SecurityConstants.PASSWORD_KEY;
+import static com.saptarshi.das.core.constants.SecurityConstants.USERNAME_KEY;
+
 @Service
 public class JwtService {
     private static final String SECRET_KEY = "fa7eb9f8667c865173e585ef77c6263490eb59e8b679bf73bac84936a2e77cfd";
+
     public String extractUsername(final String token) {
-        return extractClaims(token, claims -> claims.get("email", String.class));
+        return extractClaims(token, claims -> claims.get(USERNAME_KEY, String.class));
     }
 
     public String generateToken(final UserDetails userDetails) {
@@ -28,9 +34,9 @@ public class JwtService {
         final List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-        claims.put("email", userDetails.getUsername());
-        claims.put("password", userDetails.getPassword());
-        claims.put("authorities", authorities);
+        claims.put(USERNAME_KEY, userDetails.getUsername());
+        claims.put(PASSWORD_KEY, userDetails.getPassword());
+        claims.put(AUTHORITIES_KEY, authorities);
 
         return generateToken(claims);
     }
@@ -40,7 +46,7 @@ public class JwtService {
                 .builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_DURATION_IN_MILLISECONDS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

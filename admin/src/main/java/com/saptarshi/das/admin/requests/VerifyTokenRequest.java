@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.requests;
+package com.saptarshi.das.admin.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

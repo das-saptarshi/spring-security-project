@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.saptarshi.das.admin.constants.ExceptionConstants.USER_NOT_FOUND_MESSAGE;
+
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
@@ -16,8 +18,8 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService getUserDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found!"));
+        return username -> userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE));
     }
 
     @Bean

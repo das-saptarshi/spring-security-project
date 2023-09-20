@@ -9,22 +9,25 @@ import com.saptarshi.das.admin.requests.AuthenticationRequest;
 import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
-import com.saptarshi.das.core.models.User;
+import com.saptarshi.das.admin.responses.VerifiedUserResponse;
 import com.saptarshi.das.core.security.redis.RedisClient;
-import com.saptarshi.das.core.responses.VerifiedUserResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static com.saptarshi.das.admin.constants.ApplicationConstants.USER_REGISTRATION_SUCCESS_MESSAGE;
+import static com.saptarshi.das.admin.constants.ExceptionConstants.ACCESS_DENIED_MESSAGE;
+import static com.saptarshi.das.admin.constants.ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -37,13 +40,14 @@ public class AuthenticationService {
     private final RedisClient redis;
 
     public RegistrationResponse register(final RegisterRequest request) throws UserAlreadyExistsException {
-        final Optional<UserEntity> existingUser = userRepository.findByEmail(request.getEmail());
+        final Optional<UserEntity> existingUser = userRepository.findByUsername(request.getUsername());
 
         if (existingUser.isPresent()) {
-            throw new UserAlreadyExistsException("User Already Exists!");
+            throw new UserAlreadyExistsException(USER_ALREADY_EXISTS_MESSAGE);
         }
 
         final UserEntity user = UserEntity.builder()
+                .username(request.getUsername())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -54,20 +58,20 @@ public class AuthenticationService {
         userRepository.save(user);
 
         return RegistrationResponse.builder()
-                .message("User Registered Successfully.")
+                .message(USER_REGISTRATION_SUCCESS_MESSAGE)
                 .build();
     }
 
 
     public AuthenticationResponse generateToken(final AuthenticationRequest request) throws JsonProcessingException {
         final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
+                request.getUsername(),
                 request.getPassword()
         );
 
         authenticationManager.authenticate(authToken);
 
-        final Optional<UserEntity> user = userRepository.findByEmail(request.getEmail());
+        final Optional<UserEntity> user = userRepository.findByUsername(request.getUsername());
         final String token = jwtService.generateToken(user.get());
         redis.setUserDetailsAndToken(user.get(), token);
         return AuthenticationResponse.builder()
@@ -78,28 +82,21 @@ public class AuthenticationService {
     public VerifiedUserResponse verifyToken(@NonNull final String token) {
         final String username = jwtService.extractUsername(token);
         if (StringUtils.isBlank(username)) {
-            throw new AccessDeniedException("Access Denied! No Token Found.");
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         if (! jwtService.isValidToken(token, userDetails)) {
-            throw new AccessDeniedException("Access Denied! Invalid Token.");
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
         }
 
-        final User user = User.builder()
-                .email(userDetails.getUsername())
-                .password(userDetails.getPassword())
-                .authorities(userDetails.getAuthorities())
-                .build();
-
         return VerifiedUserResponse.builder()
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .authorities(user.getAuthorities().stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.toList())
-                )
+                .username(userDetails.getUsername())
+                .password(userDetails.getPassword())
+                .authorities(userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList())
                 .build();
     }
 }
