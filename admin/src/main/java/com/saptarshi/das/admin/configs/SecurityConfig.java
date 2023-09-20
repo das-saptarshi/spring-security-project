@@ -1,7 +1,7 @@
 package com.saptarshi.das.admin.configs;
 
-import com.saptarshi.das.core.redis.RedisAuthClient;
-import com.saptarshi.das.core.redis.RedisClient;
+import com.saptarshi.das.core.security.redis.RedisAuthClient;
+import com.saptarshi.das.core.security.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

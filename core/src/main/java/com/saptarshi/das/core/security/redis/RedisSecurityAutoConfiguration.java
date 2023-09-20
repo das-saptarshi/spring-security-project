@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.redis;
+package com.saptarshi.das.core.security.redis;
 
 import com.saptarshi.das.core.filters.AuthFilter;
 import org.springframework.beans.factory.annotation.Value;

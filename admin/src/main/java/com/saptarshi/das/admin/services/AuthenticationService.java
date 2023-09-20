@@ -10,7 +10,7 @@ import com.saptarshi.das.admin.requests.RegisterRequest;
 import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
 import com.saptarshi.das.core.models.User;
-import com.saptarshi.das.core.redis.RedisClient;
+import com.saptarshi.das.core.security.redis.RedisClient;
 import com.saptarshi.das.core.responses.VerifiedUserResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

@@ -18,6 +18,7 @@ import java.io.IOException;
 public class AuthFilter extends AbstractAuthenticationProcessingFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER = "Bearer ";
+    private static final int TOKEN_START_INDEX = BEARER.length();
 
     public AuthFilter(RequestMatcher requiresAuthenticationRequestMatcher,
                       AuthenticationManager authenticationManager) {
@@ -35,7 +36,7 @@ public class AuthFilter extends AbstractAuthenticationProcessingFilter {
             return new UsernamePasswordAuthenticationToken(null, null);
         }
 
-        final String jwtToken = bearerToken.substring(7);
+        final String jwtToken = bearerToken.substring(TOKEN_START_INDEX);
         final UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(jwtToken, jwtToken);
 

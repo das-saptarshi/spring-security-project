@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.token;
+package com.saptarshi.das.core.security.token;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

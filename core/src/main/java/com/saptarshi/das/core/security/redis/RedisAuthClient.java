@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.redis;
+package com.saptarshi.das.core.security.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

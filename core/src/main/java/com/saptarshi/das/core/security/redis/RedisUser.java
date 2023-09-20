@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.redis;
+package com.saptarshi.das.core.security.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

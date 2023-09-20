@@ -1,4 +1,4 @@
-package com.saptarshi.das.core.token;
+package com.saptarshi.das.core.security.token;
 
 import com.saptarshi.das.core.filters.AuthFilter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
