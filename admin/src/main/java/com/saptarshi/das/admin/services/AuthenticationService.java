@@ -11,9 +11,9 @@ import com.saptarshi.das.admin.responses.AuthenticationResponse;
 import com.saptarshi.das.admin.responses.RegistrationResponse;
 import com.saptarshi.das.admin.responses.VerifiedUserResponse;
 import com.saptarshi.das.core.security.redis.RedisClient;
+import com.saptarshi.das.core.security.redis.TokenNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.saptarshi.das.admin.constants.ApplicationConstants.USER_REGISTRATION_SUCCESS_MESSAGE;
-import static com.saptarshi.das.admin.constants.ExceptionConstants.ACCESS_DENIED_MESSAGE;
+import static com.saptarshi.das.admin.constants.ExceptionConstants.INVALID_TOKEN;
 import static com.saptarshi.das.admin.constants.ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE;
 
 @Service
@@ -80,15 +80,11 @@ public class AuthenticationService {
     }
 
     public VerifiedUserResponse verifyToken(@NonNull final String token) {
-        final String username = jwtService.extractUsername(token);
-        if (StringUtils.isBlank(username)) {
-            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
-        }
-
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-        if (! jwtService.isValidToken(token, userDetails)) {
-            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        UserDetails userDetails;
+        try {
+            userDetails = redis.getUserDetailsFromToken(token);
+        } catch (JsonProcessingException | TokenNotFoundException e) {
+            throw new AccessDeniedException(INVALID_TOKEN);
         }
 
         return VerifiedUserResponse.builder()

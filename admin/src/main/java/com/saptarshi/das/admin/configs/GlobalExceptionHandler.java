@@ -50,7 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             final WebRequest request
     ) {
         final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .message(ExceptionConstants.ACCESS_DENIED_MESSAGE)
+                .message(ExceptionConstants.INVALID_TOKEN)
                 .build();
         return new ResponseEntity<>(
                 exceptionResponse,
