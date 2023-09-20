@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -39,28 +40,26 @@ public class RedisSecurityAutoConfiguration {
     private Integer port;
 
     @Bean
-    public SecurityFilterChain getSecurityFilterChain(final HttpSecurity security) throws Exception {
-        final AuthenticationManager authenticationManager = getAuthenticationManager(security);
+    public SecurityFilterChain getSecurityFilterChain(final HttpSecurity security,
+                                                      final AuthFilter authFilter) throws Exception {
 
         security
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(PROTECTED_URLS).authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationManager(authenticationManager)
-                .addFilterBefore(getJwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
         return security.build();
     }
 
-    @Bean
-    public RedisClient getRedisClient() {
+    private RedisClient getRedisClient() {
         return new RedisAuthClient(host, port);
     }
 
-    @Bean
-    public AuthenticationProvider getAuthenticationProvider() {
+
+    private AuthenticationProvider getAuthenticationProvider() {
         return new RedisAuthenticationProvider(getRedisClient());
     }
 
@@ -72,7 +71,7 @@ public class RedisSecurityAutoConfiguration {
     }
 
     @Bean
-    public AuthFilter getJwtAuthenticationFilter(final AuthenticationManager authenticationManager) throws Exception {
+    public AuthFilter getAuthFilter(final AuthenticationManager authenticationManager) {
         return new AuthFilter(PROTECTED_URLS, authenticationManager);
     }
 }

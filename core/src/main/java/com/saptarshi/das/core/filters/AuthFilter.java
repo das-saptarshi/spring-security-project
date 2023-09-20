@@ -15,6 +15,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.io.IOException;
 
+import static com.saptarshi.das.core.constants.ExceptionConstants.INVALID_TOKEN_MESSAGE;
+
 public class AuthFilter extends AbstractAuthenticationProcessingFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER = "Bearer ";
@@ -33,7 +35,7 @@ public class AuthFilter extends AbstractAuthenticationProcessingFilter {
         final String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
         if (StringUtils.isBlank(bearerToken) || !bearerToken.startsWith(BEARER)) {
-            return new UsernamePasswordAuthenticationToken(null, null);
+            throw new AuthenticationException(INVALID_TOKEN_MESSAGE) {};
         }
 
         final String jwtToken = bearerToken.substring(TOKEN_START_INDEX);

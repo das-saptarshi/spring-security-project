@@ -7,6 +7,8 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import static com.saptarshi.das.core.constants.ExceptionConstants.INVALID_TOKEN_MESSAGE;
+
 @Slf4j
 public class RedisAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
     private final RedisClient redis;
@@ -16,21 +18,21 @@ public class RedisAuthenticationProvider extends AbstractUserDetailsAuthenticati
     }
 
     @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-
-    }
+    protected void additionalAuthenticationChecks(UserDetails userDetails,
+                                                  UsernamePasswordAuthenticationToken authentication
+    ) throws AuthenticationException {}
 
     @Override
     protected UserDetails retrieveUser(
             String username,
             UsernamePasswordAuthenticationToken authentication
     ) throws AuthenticationException {
-        log.info("In Redis Based Authentication.");
+        log.info("In Redis Based Authentication."); //TODO: remove after debugging
         try {
             final String token = authentication.getPrincipal().toString();
             return redis.getUserDetailsFromToken(token);
         } catch (JsonProcessingException | TokenNotFoundException e) {
-            throw new AuthenticationException("Invalid Token/User.") {};
+            throw new AuthenticationException(INVALID_TOKEN_MESSAGE) {};
         }
     }
 }

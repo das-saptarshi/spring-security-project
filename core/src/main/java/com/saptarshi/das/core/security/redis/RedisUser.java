@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RedisUser {
-    private String email;
+    private String username;
     private String password;
     private List<String> authorities;
 }
