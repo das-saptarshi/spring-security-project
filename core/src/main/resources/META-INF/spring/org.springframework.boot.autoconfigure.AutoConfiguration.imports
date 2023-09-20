@@ -1,2 +1,2 @@
-com.saptarshi.das.core.redis.RedisSecurityAutoConfiguration
-com.saptarshi.das.core.token.TokenSecurityAutoConfiguration
+com.saptarshi.das.core.security.redis.RedisSecurityAutoConfiguration
+com.saptarshi.das.core.security.token.TokenSecurityAutoConfiguration
