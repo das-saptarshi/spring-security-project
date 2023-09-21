@@ -34,13 +34,14 @@ public class TokenSecurityAutoConfiguration {
 
     @Bean
     public SecurityFilterChain getSecurityFilterChain(final HttpSecurity security,
-                                                      final AuthFilter authFilter) throws Exception {
+                                                      final AuthenticationManager authenticationManager
+    ) throws Exception {
         security
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(PROTECTED_URLS).authenticated()
                 )
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(getAuthFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return security.build();
@@ -57,8 +58,7 @@ public class TokenSecurityAutoConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public AuthFilter getAuthFilter(final AuthenticationManager authenticationManager) {
+    private AuthFilter getAuthFilter(final AuthenticationManager authenticationManager) {
         return new AuthFilter(PROTECTED_URLS, authenticationManager);
     }
 }

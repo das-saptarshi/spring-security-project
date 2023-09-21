@@ -35,13 +35,12 @@ public class RedisSecurityAutoConfiguration {
 
     @Value("${security.redis.host}")
     private String host;
-
     @Value("${security.redis.port}")
     private Integer port;
 
     @Bean
     public SecurityFilterChain getSecurityFilterChain(final HttpSecurity security,
-                                                      final AuthFilter authFilter
+                                                      final AuthenticationManager authenticationManager
     ) throws Exception {
         security
                 .csrf(AbstractHttpConfigurer::disable)
@@ -49,7 +48,7 @@ public class RedisSecurityAutoConfiguration {
                         .requestMatchers(PROTECTED_URLS).authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(getAuthFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
 
         return security.build();
     }
@@ -69,8 +68,7 @@ public class RedisSecurityAutoConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public AuthFilter getAuthFilter(final AuthenticationManager authenticationManager) {
+    private AuthFilter getAuthFilter(final AuthenticationManager authenticationManager) {
         return new AuthFilter(PROTECTED_URLS, authenticationManager);
     }
 }
