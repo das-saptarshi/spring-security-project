@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
@@ -21,7 +20,6 @@ import static com.saptarshi.das.core.constants.SecurityConstants.AUTHORITIES_KEY
 import static com.saptarshi.das.core.constants.SecurityConstants.PASSWORD_KEY;
 import static com.saptarshi.das.core.constants.SecurityConstants.USERNAME_KEY;
 
-@Slf4j
 public class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
     private static final String DOT_REGEX = "\\.";
     private static final int PAYLOAD_INDEX = 1;
@@ -37,7 +35,6 @@ public class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticati
     protected UserDetails retrieveUser(String username, 
                                        UsernamePasswordAuthenticationToken authentication
     ) throws AuthenticationException {
-        log.info("In Token Based Authentication"); //TODO: remove after debugging
         final String token = authentication.getPrincipal().toString();
         final String[] sections = token.split(DOT_REGEX);
         final String encodedPayload = sections[PAYLOAD_INDEX];
