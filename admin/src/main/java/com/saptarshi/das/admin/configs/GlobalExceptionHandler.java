@@ -1,6 +1,5 @@
 package com.saptarshi.das.admin.configs;
 
-import com.saptarshi.das.admin.constants.ExceptionConstants;
 import com.saptarshi.das.admin.exceptions.BaseException;
 import com.saptarshi.das.admin.responses.ExceptionResponse;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -15,6 +14,9 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.saptarshi.das.admin.constants.ExceptionConstants.FORBIDDEN_USER_MESSAGE;
+import static com.saptarshi.das.core.constants.ExceptionConstants.INVALID_TOKEN_MESSAGE;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,7 +38,7 @@ public class GlobalExceptionHandler {
             final WebRequest request
     ) {
         return ExceptionResponse.builder()
-                .errors(Collections.singletonList(ExceptionConstants.FORBIDDEN_USER_MESSAGE))
+                .errors(Collections.singletonList(FORBIDDEN_USER_MESSAGE))
                 .build();
     }
 
@@ -47,7 +49,7 @@ public class GlobalExceptionHandler {
             final WebRequest request
     ) {
         return ExceptionResponse.builder()
-                .errors(Collections.singletonList(ExceptionConstants.INVALID_TOKEN))
+                .errors(Collections.singletonList(INVALID_TOKEN_MESSAGE))
                 .build();
     }
 

@@ -12,28 +12,31 @@ import com.saptarshi.das.admin.responses.RegistrationResponse;
 import com.saptarshi.das.admin.responses.VerifiedUserResponse;
 import com.saptarshi.das.core.security.redis.RedisClient;
 import com.saptarshi.das.core.security.redis.TokenNotFoundException;
+import io.micrometer.common.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 import static com.saptarshi.das.admin.constants.ApplicationConstants.USER_REGISTRATION_SUCCESS_MESSAGE;
-import static com.saptarshi.das.admin.constants.ExceptionConstants.INVALID_TOKEN;
 import static com.saptarshi.das.admin.constants.ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE;
+import static com.saptarshi.das.core.constants.ExceptionConstants.INVALID_TOKEN_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private static final String BEARER = "Bearer ";
+    private static final int TOKEN_START_INDEX = BEARER.length();
+
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -80,19 +83,22 @@ public class AuthenticationService {
     }
 
     public VerifiedUserResponse verifyToken(@NonNull final String token) {
-        UserDetails userDetails;
-        try {
-            userDetails = redis.getUserDetailsFromToken(token);
-        } catch (JsonProcessingException | TokenNotFoundException e) {
-            throw new AccessDeniedException(INVALID_TOKEN);
+        if (StringUtils.isBlank(token) || !token.startsWith(BEARER)) {
+            throw new AuthenticationException(INVALID_TOKEN_MESSAGE) {};
         }
+        final String jwtToken = token.substring(TOKEN_START_INDEX);
 
-        return VerifiedUserResponse.builder()
-                .username(userDetails.getUsername())
-                .password(userDetails.getPassword())
-                .authorities(userDetails.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList())
-                .build();
+        try {
+            final UserDetails userDetails = redis.getUserDetailsFromToken(jwtToken);
+            return VerifiedUserResponse.builder()
+                    .username(userDetails.getUsername())
+                    .password(userDetails.getPassword())
+                    .authorities(userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .toList())
+                    .build();
+        } catch (JsonProcessingException | TokenNotFoundException e) {
+            throw new AccessDeniedException(INVALID_TOKEN_MESSAGE);
+        }
     }
 }
